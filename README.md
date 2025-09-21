@@ -3,7 +3,12 @@
 ## Organisation
 
 Horaire : de 9h à 12h30 et de 13h30 à 17h
-Tel pro Odile 06 99 26 53 78
+<details><summary>Tel pro Odile</summary>
+<pre>
+ 06 99 26 53 78
+</pre>
+</details>
+
 
 Présentiel et exceptionnellement en distanciel lors des grève etc ...
 Autonomie encadrée pour avancer les soutenances et entrepreneuriat
