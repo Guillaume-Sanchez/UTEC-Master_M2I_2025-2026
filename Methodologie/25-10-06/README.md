@@ -15,9 +15,9 @@
     - Approche qualitative : recherche sur l’hypothèse
     - Approche quantitative : étude des nombres 
     - Approche comparative 
-    - Approche hybride 
+    - Approche hybride
 
-### Veille doit prendre en considération deux facteurs :
+### Veille doit prendre en considération deux facteurs :
 
 - Economique 
 - Juridique 
