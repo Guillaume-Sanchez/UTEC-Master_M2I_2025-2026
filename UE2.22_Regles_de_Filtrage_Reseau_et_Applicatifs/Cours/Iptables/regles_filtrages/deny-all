@@ -1,0 +1,9 @@
+
+#!/bin/bash
+iptables -F
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT DROP
+INTERFACE_LOOPBACK=lo
+iptables -A INPUT -i $INTERFACE_LOOPBACK -j ACCEPT
+iptables -A OUTPUT -o $INTERFACE_LOOPBACK -j ACCEPT

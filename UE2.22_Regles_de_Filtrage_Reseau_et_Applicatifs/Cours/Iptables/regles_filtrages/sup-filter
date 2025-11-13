@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Vérification des privilèges root
+[ "$EUID" -ne 0 ] && { echo "Erreur : Exécutez en tant que root."; exit 1; }
+
+echo "Réinitialisation des règles iptables en cours..."
+
+# Effacer toutes les règles des chaînes prédéfinies
+iptables -F  # Flush all rules
+iptables -X  # Delete all custom chains
+iptables -Z  # Reset all packet and byte counters
+
+# Définir une politique par défaut
+#iptables -P INPUT ACCEPT   # Accepter toutes les connexions entrantes
+#iptables -P OUTPUT ACCEPT  # Autoriser toutes les connexions sortantes
+#iptables -P FORWARD DROP   # Bloquer le forwarding par défaut
+
+# Confirmation
+echo "Toutes les règles iptables ont été réinitialisées."
+echo "Politique par défaut appliquée :"
+echo "- INPUT : ACCEPT"
+echo "- OUTPUT : ACCEPT"
+echo "- FORWARD : DROP"

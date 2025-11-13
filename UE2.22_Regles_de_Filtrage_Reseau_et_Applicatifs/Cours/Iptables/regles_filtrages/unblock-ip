@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Vérification des privilèges root
+[ "$EUID" -ne 0 ] && { echo "Erreur : Exécutez en tant que root."; exit 1; }
+
+# Vérification de l'argument
+[ $# -ne 1 ] && { echo "Usage : $0 <Adresse-IP>"; exit 1; }
+
+IP="$1"
+
+# Suppression des règles bloquant l'IP
+for CHAIN in INPUT OUTPUT FORWARD; do
+    iptables -D "$CHAIN" -s "$IP" -j DROP 2>/dev/null
+    iptables -D "$CHAIN" -d "$IP" -j DROP 2>/dev/null
+done
+
+echo "IP $IP débloquée."
