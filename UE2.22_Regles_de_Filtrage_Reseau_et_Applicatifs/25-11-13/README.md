@@ -1,5 +1,7 @@
 # TP Filtrage de paquets
 
+> Guillaume Sanchez
+
 ## Politique de filtrage par défaut
 
 1. Lancer la commande iptables -L puis observer la sortie d’écran. 
@@ -413,15 +415,52 @@ Les 5 premières connexion SSH fonctionne, mais pas les 5 dernières. Si je refa
 
 10. Créer  une  nouvelle  chaîne  qui  journalise  puis  rejette  tout  paquet  qui  la traverse.  Les  paquets  journalisés  doivent  être  précédés  par  le  préfixe [FIREWALL  DROP].  Renvoyer  ensuite  sur  cette  nouvelle  chaîne  tout  paquet entrant qui demande l’établissement d’une nouvelle connexion.
 
-
+Pas compris
 
 11. Positionnez la politique de filtrage par défaut à DROP pour les trois chaînes prédéfinies 
 
+Simplement c'est 3 commandes la :
+
+`iptables -P INPUT DROP`
+
+`iptables -P OUTPUT DROP`
+
+`iptables -P FORWARD DROP`
+
 12. Autoriser  tout  paquet  sortant  relatif  à  une  connexion  déjà  établie  ou  en rapport avec une connexion déjà établie 
+
+Pour autoriser tout paquet sortant qui appartient à une connexion déjà établie ou en rapport avec une connexion existante, on utilise le module state ou conntrack d’iptables.
+
+`iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT`
 
 13. Interdire tout paquet sortant relatif à une connexion de type INVALID 
 
+Pour bloquer tout paquet sortant qui est de type INVALID, on utilise le module state (ou conntrack) :
+
+`iptables -A OUTPUT -m state --state INVALID -j DROP`
+
 14. Autoriser tout paquet créant une nouvelle connexion en entrée à destination du port 80 
+
+Pour autoriser tout paquet entrant qui initie une nouvelle connexion TCP vers le port 80, on utilise le module state ou conntrack pour détecter les paquets NEW :
+
+`iptables -A INPUT -p tcp --dport 80 -m state --state NEW -j ACCEPT`
+
+Un test simple avec un curl pour bien montrer que ça marche :
+
+```
+root@U2-22-client:~# curl http://192.168.1.235
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Apache2 Debian Default Page: It works</title>
+  </head>
+  <body>
+	<p>Vous êtes sur la machine 192.168.1.235 de Guillaume Sanchez
+  </body>
+</html>
+```
 
 15. Utiliser le navigateur web du poste de travail pour accéder à l’adresse URL « http://www.network.net/site ». Que constatez-vous ? 
 
