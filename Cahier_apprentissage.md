@@ -34,7 +34,7 @@ Accueil de la classe
 - UE2.42 - Environnement technologique de la cybersécurité et évaluation du niveau de sécurité : 
 - UE2.13 - Organisation de l'entreprise : l'explication des différents styles de management structure organisation et Étude de cas.
 - UE2.** - Audit des Systèmes d'information : recherche et cas pratique.
-- UE2.33 - Analyse des vulnérabilités, menaces logicielles et sécurisation : TP1 Initiation au pentest et TP2 Mise en Pratique Metasploit
-- UE2.23 - Virtualisation et container :  mise en place de l'infra
-- UE2.22 - Règles de filtrage réseau et applicatifs : Opensens blocage des injections SQL 
+- UE2.33 - Analyse des vulnérabilités, menaces logicielles et sécurisation : TP1 Initiation au pentest et TP2 Mise en Pratique Metasploit.
+- UE2.23 - Virtualisation et container :  mise en place de l'infra.
+- UE2.22 - Règles de filtrage réseau et applicatifs : Opensens blocage des injections SQL.
 - UE2.19 - Retour d'expérience, veille et revues des exigences : recherche et cas pratique.
