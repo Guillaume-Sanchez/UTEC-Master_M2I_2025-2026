@@ -39,9 +39,9 @@ echo "--- Récupération du site web ---"
 
 # 4. Cloner ou télécharger les fichiers du site
 mkdir -p html
-git clone https://github.com/Guillaume-Sanchez/cyberDay-crackthehash.git
-mv cyberDay-crackthehash/dev/build/* html/
-rm -rf cyberDay-crackthehash
+https://github.com/Guillaume-Sanchez/UTEC-Master_M2I_2025-2026.git
+mv UTEC-Master_M2I_2025-2026/cyberDay/crackthehash/dev/build/* html/
+rm -rf UTEC-Master_M2I_2025-2026
 
 echo "--- Lancement des conteneurs ---"
 
