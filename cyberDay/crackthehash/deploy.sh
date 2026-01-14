@@ -48,4 +48,4 @@ echo "--- Lancement des conteneurs ---"
 # 5. Lancer Docker
 docker compose up -d
 
-echo "✅ Déploiement terminé ! Site accessible sur http://localhost/:8081"
+echo "✅ Déploiement terminé ! Site accessible sur le port :8081"
