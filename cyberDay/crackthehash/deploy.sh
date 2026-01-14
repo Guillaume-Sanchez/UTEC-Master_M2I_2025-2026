@@ -16,9 +16,7 @@ services:
     ports:
       - "8081:80"
     volumes:
-      # On monte le dossier courant (qui contiendra le site)
       - ./html:/var/www/html
-      # On monte une config apache personnalisée si nécessaire
       - ./my-httpd.conf:/etc/apache2/sites-enabled/000-default.conf
 EOF
 
@@ -40,10 +38,7 @@ EOF
 echo "--- Récupération du site web ---"
 
 # 4. Cloner ou télécharger les fichiers du site
-# Si le code est dans le même repo que ce script, on peut faire un git sparse-checkout
-# Ou simplement télécharger un zip si c'est plus simple
 mkdir -p html
-
 git clone https://github.com/Guillaume-Sanchez/cyberDay-crackthehash.git
 mv cyberDay-crackthehash/dev/build/* html/
 rm -rf cyberDay-crackthehash
@@ -53,4 +48,4 @@ echo "--- Lancement des conteneurs ---"
 # 5. Lancer Docker
 docker compose up -d
 
-echo "✅ Déploiement terminé ! Site accessible sur http://localhost"
+echo "✅ Déploiement terminé ! Site accessible sur http://localhost/:8081"
