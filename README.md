@@ -21,3 +21,4 @@ Sept 2025 Setp 2026 -> Contrôle continu, pas de partiel
 - Juin : veille Techno (en Groupe, en anglais)
 - Juillet : entrepreneuriat (en Groupe, orienté technique en français)
 - Septembre : activité Pro (individuelle en français)
+
