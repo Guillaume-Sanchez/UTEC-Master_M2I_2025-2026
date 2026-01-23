@@ -40,7 +40,7 @@ Pour ce connecter avec un linux à la Wifi Pedagogie CCI
 - Cocher "Aucun certificat d'AC n'est requis
 - Version de PEAP : Automatique
 - Autentification interne : MSCHAPv2
-- Nom d'utilisateur : mail.cfautec.fr 
+- Nom d'utilisateur : mail@cfautec.fr 
 - Mot de passe : .... Ton mdp
 
 ### Autoriser les vieux algos de chiffrement (Legacy)
@@ -49,7 +49,7 @@ Le serveur utilise une version de TLS (SSL) trop vieille pour Debian 13 (OpenSSL
 
 #### Modifions le fichier de configuration directement :
 
-Ouvrez le fichier de connexion en root (nano ou gedit) :
+Ouvrez le fichier de connexion en root :
 
 ```Bash
 sudo vim "/etc/NetworkManager/system-connections/Pedagogie CCI.nmconnection"

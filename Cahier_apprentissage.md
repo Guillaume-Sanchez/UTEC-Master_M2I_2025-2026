@@ -44,3 +44,4 @@ Accueil de la classe
 - UE2.33 - Analyse des vulnérabilités, menaces logicielles et sécurisation : Suite du TP2 Enumeration et installation de Nessus pour le TP3_Tests de vulnérabilité
 - UE2.22 - Règles de filtrage réseau et applicatifs : Suite TP WAFV et TP OPNsense
 - UE2.11 - Mathématiques : Installation de R Studio et Chaiptre 1 Probabilité
+- UE2.23 - Virtualisation et container : Continuité du projet
