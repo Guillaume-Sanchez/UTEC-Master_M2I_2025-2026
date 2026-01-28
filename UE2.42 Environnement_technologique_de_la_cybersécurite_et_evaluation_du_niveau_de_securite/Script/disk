@@ -1,0 +1,459 @@
+#!/bin/bash
+
+# Par défaut : EFFACER_ANCIEN_FICHIER=true
+#EFFACER_ANCIEN_FICHIER=false
+
+REP_STOCKAGE_PERSISTANT="PROJETS_GNS3"
+
+declare -a FICHIER_DE_REFERENCE
+#FICHIER_DE_REFERENCE=("VM_VDI" "Windows" "home")
+#FICHIER_DE_REFERENCE=('System Volume Information' 'home' 'VM_VDI' )
+FICHIER_DE_REFERENCE=('VM_VDI' 'Program Files' 'System Volume Information' 'home' )
+SIZE_MINIMAL_PARTITION=10 # 10 Go
+
+PATH_PROJET_GNS3="/home/user/projects"
+
+PATH_MOUNT_PERSISTANT="/mnt/persistant"
+
+LOCK_DISABLE_MEMINDISK='/opt/raizo/etc/no_memindisk.lock'
+
+# -----------------------------
+
+PATH_GNS3_PERSISTANT="${PATH_MOUNT_PERSISTANT}/${REP_STOCKAGE_PERSISTANT}"
+
+PATH_OTHER_TOOLS="${PATH_GNS3_PERSISTANT}/.tmp"
+
+CINFO='\e[4;1;31m' # Rouge souligné
+CERROR='\e[0;1;31m' # Rouge
+SansCouleur='\e[0;m'
+COK='\e[1;32m' # Vert
+CMONTAGEOK='\e[1;36m' # Cyan
+CMONTAGEPARTIEL='\e[1;34m' # Bleu
+
+#### > Patchs ------------------------
+
+# 2025/02/24 : Pour LiveRaizo 16.25.01.25
+Place_xmlciscocom()
+{
+	if ! grep -q xml.cisco.com /etc/hosts
+	then
+		sudo sed -E -i 's/127\.0\.0\.1.+/& xml.cisco.com/' /etc/hosts
+	fi
+}
+Place_xmlciscocom
+
+### ---------------------------------<
+
+if [ -e "${LOCK_DISABLE_MEMINDISK}" ]
+then
+	echo  -e "${CERROR}* memindisk : Warning : memindisk a été précédemment désactivé${SansCouleur}"
+	return
+fi
+
+utilise_memindisk() {
+
+	## fast-restore-lab :
+	sudo mkdir -p "${PATH_OTHER_TOOLS}/uncompress"
+#	sudo chmod a+rwx "${PATH_OTHER_TOOLS}/uncompress"
+	sudo chown user:user "${PATH_OTHER_TOOLS}/uncompress"
+	sudo sed -i 's%^\([[:blank:]]*REP_TMP_TO_UNCOMPRESS\)=.*%\1="'${PATH_OTHER_TOOLS}/uncompress'"%g' /opt/raizo/bin/fast-restore-lab
+	sudo sed -i 's%^\([[:blank:]]*REP_TMP\)=.*%\1="'${PATH_OTHER_TOOLS}/uncompress'"%g' /opt/raizo/bin/fast-save-project
+
+	## livebtfs :
+	if [ ! -e /home/.userlivebtfs ]
+	then
+		# il n'existe pas, donc il n'est pas utilisé par un processus, donc je peux encore le "déplacer" ailleurs
+
+		if [ -e "${PATH_OTHER_TOOLS}/userlivebtfs" ]
+		then
+			# Meme si je conserve les projets dans REP_STOCKAGE_PERSISTANT, je supprime les fichiers (tmps) dans "${PATH_OTHER_TOOLS}/userlivebtfs"
+			sudo rm -rf "${PATH_OTHER_TOOLS}/userlivebtfs"
+		fi
+		sudo mkdir -p "${PATH_OTHER_TOOLS}/userlivebtfs"
+
+#		sudo chmod a+rwx "${PATH_OTHER_TOOLS}/userlivebtfs"
+		sudo chown user:user "${PATH_OTHER_TOOLS}/userlivebtfs"
+		sudo ln -s "${PATH_OTHER_TOOLS}/userlivebtfs" /home/.userlivebtfs
+	fi
+}
+
+demonter(){
+
+	if ! sudo umount "$1" &> /dev/null
+	then
+		>&2 echo -e "${CERROR}memindisk : Erreur : Impossible de démonter le disque $1${SansCouleur}"
+		return 1
+	fi
+}
+
+
+monter_ro(){
+
+	if ! sudo mount -t auto -o ro "$1" "$2" &> /dev/null
+	then
+		>&2 echo -e  "Info: Impossible de monter $1"
+		return 1
+	fi
+}
+
+monter_rw(){
+
+	partition="$1"
+	montage="$2"
+
+	local type=$(lsblk -n -o FSTYPE "${partition}")
+
+	local Option=""
+	if [ "${type}" = ntfs ]
+	then
+		Option=",noatime,async,big_writes"
+	fi
+
+	if ! sudo mount -t auto -o rw${Option} "${partition}" "${montage}" &> /dev/null
+	then
+#		>&2 echo -e "${CERROR}memindisk : Erreur : Impossible de monter en écriture ${partition} dans ${montage}${SansCouleur}"
+		echo "memindisk : Erreur : Impossible de monter en écriture ${partition} dans ${montage}"
+		return 1
+	fi
+
+	# vérifie l'accès en écriture : disk en mode hiberné ?
+	local FichierTemps=$(sudo mktemp -q --tmpdir="${montage}")
+	if [ ! -e "${FichierTemps}" ]
+	then
+#		>&2 echo -e "${CERROR}memindisk : Erreur : Impossible de monter en écriture ${partition} dans ${montage}${SansCouleur}"
+		echo "memindisk : Erreur : Impossible de monter en écriture ${partition} dans ${montage}"
+		demonter "$partition"
+		return 1
+	fi
+	sudo rm "${FichierTemps}"
+
+}
+
+clean(){
+
+	if  grep "${PATH_PROJET_GNS3}" /etc/mtab &> /dev/null
+	then
+		demonter "${PATH_PROJET_GNS3}"
+	fi
+
+	if  grep "${PATH_MOUNT_PERSISTANT}" /etc/mtab &> /dev/null
+	then
+		demonter "${PATH_MOUNT_PERSISTANT}"
+	fi
+}
+
+reset_projets_gns3(){
+
+	if [ -e "${PATH_GNS3_PERSISTANT}" ]
+	then
+		if ${EFFACER_ANCIEN_FICHIER}
+		then
+			if !  sudo rm -r  "${PATH_GNS3_PERSISTANT}" &> /dev/null
+			then
+				>&2 echo -e "${CERROR}memindisk : Erreur : Impossible de supprimer les fichiers dans le dossier ${PATH_GNS3_PERSISTANT}${SansCouleur}"
+				return 1
+			fi
+		else
+			return 0
+		fi
+	fi
+
+	if ! sudo mkdir "${PATH_GNS3_PERSISTANT}" &> /dev/null
+	then
+		>&2 echo -e "${CERROR}memindisk : Erreur : Impossible de créer le dossier ${PATH_GNS3_PERSISTANT}${SansCouleur}"
+		return 1
+	fi
+	sudo chown user:user "${PATH_GNS3_PERSISTANT}"
+
+	# Vérifie la taille disponible sur la partition
+	taille_disque=$(df -BG --output=size "${PATH_MOUNT_PERSISTANT}" | tail -n 1 | awk '{print $1}' | sed 's/G//')
+	if (( taille_disque < SIZE_MINIMAL_PARTITION ))
+	then
+		>&2 echo -e "${CERROR}memindisk : Warning : Il ne reste que ${taille_disque}Go${SansCouleur}"
+	fi
+}
+
+fusionne_projet_gns3(){
+
+	if [ ! -e  "${PATH_PROJET_GNS3}" ]
+	then
+		# Le répertoire des projets n'existe pas encore
+
+		# Répertoire de montage
+		if ! mkdir "${PATH_PROJET_GNS3}"  &> /dev/null
+		then
+			>&2 echo -e "${CERROR}memindisk : Erreur : Impossible de créer le répertoire ${PATH_PROJET_GNS3}${SansCouleur}"
+			return 1
+		fi
+
+		if ! sudo mount --bind "${PATH_GNS3_PERSISTANT}" "${PATH_PROJET_GNS3}"
+		then
+			>&2 echo -e "${CERROR}memindisk : Erreur : Impossible de monter ${PATH_GNS3_PERSISTANT} dans ${PATH_PROJET_GNS3}${SansCouleur}"
+			return 1
+		fi
+
+		return 0
+	fi
+
+	dirRep="$(dirname "${PATH_PROJET_GNS3}")"
+	nomRep="$(basename "${PATH_PROJET_GNS3}")"
+	Identifiant=$(date +"%g%m%d%H%M%S")
+
+	Ancien_PATH_PROJET_GNS3="${dirRep}/.${nomRep}.${Identifiant}"
+
+	if ! mv "${PATH_PROJET_GNS3}" "${Ancien_PATH_PROJET_GNS3}"  &> /dev/null
+	then
+		>&2 echo -e "${CERROR}memindisk : Erreur : Impossible de renommer le répertoire ${PATH_PROJET_GNS3} en ${Ancien_PATH_PROJET_GNS3}${SansCouleur}"
+		return 1
+	fi
+
+	if ! mkdir "${PATH_PROJET_GNS3}"  # &> /dev/null
+	then
+		>&2 echo -e "${CERROR}memindisk : Erreur : Impossible de créer le répertoire ${PATH_PROJET_GNS3}${SansCouleur}"
+		return 1
+	fi
+
+	REP_RW="${PATH_OTHER_TOOLS}/workdir"
+	if [ -e "${REP_RW}" ]
+	then
+		if !  sudo rm -r "${REP_RW}" &> /dev/null
+		then
+			>&2 echo -e "${CERROR}memindisk : Erreur : Impossible de supprimer le répertoire ${REP_RW}${SansCouleur}"
+			return 1
+		fi
+	fi
+
+	if ! mkdir -p "${REP_RW}"  # &> /dev/null
+	then
+		>&2 echo -e "${CERROR}memindisk : Erreur : Impossible de créer le répertoire ${REP_RW}${SansCouleur}"
+		return 1
+	fi
+
+	# sudo mount overlay -t overlay -o lowerdir="${Ancien_PATH_PROJET_GNS3}",upperdir="${REP_UPPER}",workdir="${REP_RW}" "${PATH_PROJET_GNS3}"
+	#  -> overlayfs refuse que le upperdir soit du type fuseblk ( ntfs )
+
+
+	if [ -e /usr/bin/mhddfs ]
+	then
+		if ! sudo mhddfs "${PATH_GNS3_PERSISTANT}","${Ancien_PATH_PROJET_GNS3}" "${PATH_PROJET_GNS3}"  -o allow_other &> /dev/null
+        	then
+			>&2 echo -e "${CERROR}memindisk : Erreur : Impossible de fusionner les répertoires ${PATH_MOUNT_PERSISTANT}/${REP_STOCKAGE_PERSISTANT} et ${Ancien_PATH_PROJET_GNS3} dans ${PATH_PROJET_GNS3}${SansCouleur}"
+                	return 1
+        	fi
+	elif [ -e /usr/bin/mergerfs ]
+	then
+		#echo "sudo mergerfs "${PATH_GNS3_PERSISTANT}=RW:${Ancien_PATH_PROJET_GNS3}=RO" "${PATH_PROJET_GNS3}" -o allow_other,use_ino,category.create=ff" > /tmp/mergefs.txt
+		#if ! sudo mergerfs "${PATH_GNS3_PERSISTANT}:${Ancien_PATH_PROJET_GNS3}" "${PATH_PROJET_GNS3}" -o allow_other &> /dev/null
+		#if ! sudo mergerfs "${PATH_GNS3_PERSISTANT}=RW:${Ancien_PATH_PROJET_GNS3}=RO" "${PATH_PROJET_GNS3}" -o allow_other,use_ino,category.create=ff  &> /dev/null
+		#if ! sudo mergerfs "${PATH_GNS3_PERSISTANT}=RW:${Ancien_PATH_PROJET_GNS3}=RO" "${PATH_PROJET_GNS3}" -o allow_other,inodecalc=path-hash,writeback_cache=true  &> /dev/null
+		#if ! sudo mergerfs "${PATH_GNS3_PERSISTANT}=RW:${Ancien_PATH_PROJET_GNS3}=RO" "${PATH_PROJET_GNS3}" -o allow_other,inodecalc=path-hash,category.create=epmfs,minfreespace=4Gx  &> /tmp/mergefs.txt
+		echo sudo mergerfs "${PATH_GNS3_PERSISTANT}=RW:${Ancien_PATH_PROJET_GNS3}=RO" "${PATH_PROJET_GNS3}" -o allow_other,use_ino,category.create=ff,cache.files=partial,dropcacheonclose=true,direct_io=false  &> /tmp/mergefs.txt
+		if ! sudo mergerfs "${PATH_GNS3_PERSISTANT}=RW:${Ancien_PATH_PROJET_GNS3}=RO" "${PATH_PROJET_GNS3}" -o allow_other,use_ino,category.create=ff,cache.files=partial,dropcacheonclose=true,direct_io=false  &>> /tmp/mergefs.txt
+        	then
+			>&2 echo -e "${CERROR}memindisk : Erreur : Impossible de fusionner les répertoires ${PATH_MOUNT_PERSISTANT}/${REP_STOCKAGE_PERSISTANT} et ${Ancien_PATH_PROJET_GNS3} dans ${PATH_PROJET_GNS3}${SansCouleur}"
+                	return 1
+        	fi
+	fi
+
+	return 0
+}
+
+set_projet_gns3(){
+
+	if ! reset_projets_gns3 "${PATH_MOUNT_PERSISTANT}"
+	then
+		return 1
+	fi
+
+	if ! fusionne_projet_gns3
+	then
+		return 1
+	fi
+
+	return 0
+}
+
+check_point_montage(){
+
+	# $1 : partition
+
+	if [  -e "$1" ]  && mountpoint -q "$1"
+	then
+		return 0
+	fi
+
+	return 1
+}
+
+
+create_point_montage(){
+
+	# $1 : partition
+
+	if check_point_montage "$1"
+	then
+		return 1
+	fi
+
+	if [ ! -e "$1" ]
+	then
+		if [ -w "$(dirname $1)" ]
+		then
+			if ! mkdir "$1" &> /dev/null
+			then
+				>&2 echo -e "${CERROR}memindisk : Erreur : Impossible de créer le répertoire $1${SansCouleur}"
+				return 1
+			fi
+		else
+			if ! sudo mkdir "$1" &> /dev/null
+			then
+				>&2 echo -e "${CERROR}memindisk : Erreur : Impossible de créer le répertoire $1${SansCouleur}"
+				return 1
+			fi
+			if ! sudo chown user:user "$1" &> /dev/null
+			then
+				>&2 echo -e "${CERROR}memindisk : Erreur : Impossible de changer les droits sur le répertoire $1${SansCouleur}"
+				return 1
+			fi
+		fi
+	fi
+
+	return 0
+}
+
+mise_en_place_partition(){
+
+	fichier_reference="$1"
+	partition="$2"
+
+	if ! monter_ro "$partition" "${PATH_MOUNT_PERSISTANT}"
+	then
+		return 1
+	fi
+
+	# vérifier si le répertoire de référence existe
+	if [ ! -e "${PATH_MOUNT_PERSISTANT}/${fichier_reference}" ]
+	then
+		demonter "$partition"
+		return 1
+	fi
+
+	# Vérifie la taille disponible sur la partition
+	taille_disque=$(df -BG --output=size "${PATH_MOUNT_PERSISTANT}" | tail -n 1 | awk '{print $1}' | sed 's/G//')
+	if (( taille_disque < SIZE_MINIMAL_PARTITION ))
+	then
+		demonter "$partition"
+		return 1
+	fi
+
+	# vérifie si ce n'est pas la clé USB LiveRaizo
+#	if [ -d "${PATH_MOUNT_PERSISTANT}/boot" ] || [ -d "${PATH_MOUNT_PERSISTANT}/EFI" ]
+#	then
+#		demonter "$partition"
+#		return 1
+#	fi
+
+	# On démonte car monté en read-only
+	if ! demonter "$partition"
+	then
+		return 1
+	fi
+
+	pidGNS3=$(pgrep gns3)
+	if [ -n "${pidGNS3}" ]
+	then
+        	FAST_ERROR_RAIZO=2
+	        FAST_ERROR_RAIZO_LOG="Erreur : GNS3 doit être fermé avant"
+        	>&2 echo -e "${CERROR}memindisk : Erreur : GNS3 doit être fermé avant (nomemindisk ?) !!!${SansCouleur}"
+	        return 2
+	fi
+
+	if ! monter_rw "$partition" "${PATH_MOUNT_PERSISTANT}"
+	then
+		return 1
+	fi
+
+	if ! set_projet_gns3
+	then
+		>&2 echo -e "${CERROR}memindisk : Erreur : Impossible de construire le dossier persistant ${SansCouleur}"
+		demonter "$partition"
+		return 1
+	fi
+
+	# afficher un message
+	echo -e "${CMONTAGEOK}* memindisk : Ajout du disque ${PATH_MOUNT_PERSISTANT} comme mémoire${SansCouleur}"
+	return 0
+
+}
+
+run_memindisk() {
+
+if (( ! EUID ))
+then
+        FAST_ERROR_RAIZO=1
+        FAST_ERROR_RAIZO_LOG="Erreur : vous ne devez pas avoir les pouvoirs d'administrateur"
+        >&2 echo -e "${CERROR}memindisk : Erreur : vous ne devez pas avoir les pouvoirs d'administrateur (nomemindisk ?)${SansCouleur}"
+        return 1
+fi
+
+if ! create_point_montage "$PATH_MOUNT_PERSISTANT" && [ -e "$PATH_PROJET_GNS3" ]
+then
+#	FAST_ERROR_RAIZO=2
+	if mount -l | grep -q "${PATH_PROJET_GNS3} type fuse.mhddfs"
+	then
+		echo -e "${CMONTAGEPARTIEL}* memindisk : Warning : L'operation a déjà été effectuée${SansCouleur}"
+	else
+		echo -e "${CMONTAGEOK}* memindisk : Warning : L'operation a déjà été effectuée${SansCouleur}"
+	fi
+
+	return 1
+fi
+
+pidGNS3=$(pgrep gns3)
+if [ -n "${pidGNS3}" ]
+then
+       	FAST_ERROR_RAIZO=2
+        FAST_ERROR_RAIZO_LOG="Erreur : GNS3 doit être fermé avant"
+       	>&2 echo -e "${CERROR}memindisk : Erreur : GNS3 doit être fermé avant (nomemindisk ?) !!!${SansCouleur}"
+        return 2
+fi
+
+# la boucle doit être globale car je dois trouver d'abord "VM_VDI" avant de chercher "Windows"
+for FichierReference in "${FICHIER_DE_REFERENCE[@]}"
+do
+	# /dev/sd : partition classique
+	# /dev/nvme : specifique pour accéder à des disques SSD attachés à du PCI
+	for disk in $(find /dev/ -maxdepth 1 -name "sd*" -o -iname "nvme*")
+	do
+		# vérifie que le disque n'est pas monté
+		if  ! grep -q "^$disk"  /etc/mtab &> /dev/null
+		then
+			if ls  "$disk"* | egrep  "${disk}[0-9]+" &>  /dev/null
+			then	# il existe au moins une partition
+
+					for partition in $(ls "$disk"*  | egrep  "${disk}[1-9]+")
+					do
+						if mise_en_place_partition "${FichierReference}" "$partition"
+						then
+							utilise_memindisk
+							return 0
+						fi
+					done
+
+			else # pas de partitions dans le disque $disk
+
+				if mise_en_place_partition "${FichierReference}" "$disk"
+				then
+					utilise_memindisk
+					return 0
+				fi
+			fi
+		fi
+	done
+done
+
+#echo  -e "${COK}* memindisk : Warning : Aucun disque possèdant un des motifs ${FICHIER_DE_REFERENCE[@]} n'a été trouvé ${SansCouleur}"
+echo  -e "${CERROR}* memindisk : Warning : Aucun disque possèdant un des motifs $(printf "'%s' " "${FICHIER_DE_REFERENCE[@]}") n'a été trouvé ${SansCouleur}"
+#FAST_ERROR_RAIZO=3
+}
+run_memindisk
