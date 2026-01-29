@@ -31,7 +31,7 @@ Accueil de la classe
 - UE2.15 - Gestion des ressources humaines : santé et bien être au travail exemple droit de retrait
 - UE2.52 - Entrepreunariat : continuité des différents projets.
 - UE2.10 - Anglais : exercice sur le TOEIC
-- UE2.42 - Environnement technologique de la cybersécurité et évaluation du niveau de sécurité : 
+- UE2.42 - Environnement technologique de la cybersécurité et évaluation du niveau de sécurité : TP 1
 - UE2.13 - Organisation de l'entreprise : l'explication des différents styles de management structure organisation et Étude de cas.
 - UE2.31 - Audit des Systèmes d'information : recherche et cas pratique.
 - UE2.33 - Analyse des vulnérabilités, menaces logicielles et sécurisation : TP1 Initiation au pentest et TP2 Mise en Pratique Metasploit.
@@ -41,7 +41,10 @@ Accueil de la classe
 
 ## Janvier :
 
-- UE2.33 - Analyse des vulnérabilités, menaces logicielles et sécurisation : Suite du TP2 Enumeration et installation de Nessus pour le TP3_Tests de vulnérabilité
+- UE2.33 - Analyse des vulnérabilités, menaces logicielles et sécurisation : Suite du TP2 Enumeration et installation de Nessus pour le TP3_Tests de vulnérabilité - TP3, rapport d'intrusion et début TP4
 - UE2.22 - Règles de filtrage réseau et applicatifs : Suite TP WAFV et TP OPNsense
-- UE2.11 - Mathématiques : Installation de R Studio et Chaiptre 1 Probabilité
+- UE2.11 - Mathématiques : Installation de R Studio Probabilité et Dénombrement
 - UE2.23 - Virtualisation et container : Continuité du projet
+- UE2.10 - Anglais : TOIEC et théorie sur la Présentation
+- UE2.42 - Environnement technologique de la cybersécurité et évaluation du niveau de sécurité : TP 2
+- UE2.34 - Analyse de la sécurité des réseaux :
