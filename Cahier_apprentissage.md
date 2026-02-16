@@ -47,4 +47,8 @@ Accueil de la classe
 - UE2.23 - Virtualisation et container : Continuité du projet
 - UE2.10 - Anglais : TOIEC et théorie sur la Présentation
 - UE2.42 - Environnement technologique de la cybersécurité et évaluation du niveau de sécurité : TP 2
-- UE2.34 - Analyse de la sécurité des réseaux :
+- UE2.34 - Analyse de la sécurité des réseaux : Introduction à la sécurité
+
+# Février :
+
+- UE2.34_Analyse_de_la_securite_des_reseaux : Suite Introduction à la sécurité + TP0
