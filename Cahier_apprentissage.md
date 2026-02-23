@@ -51,4 +51,9 @@ Accueil de la classe
 
 # Février :
 
-- UE2.34_Analyse_de_la_securite_des_reseaux : Suite Introduction à la sécurité + TP0
+- UE2.34_Analyse_de_la_securite_des_reseaux : Suite Introduction à la sécurité + TP0 + TP1
+
+
+
+- UE2.00 AMDEC : 
+- UE2.10_Anglais : Présentation orale libre
