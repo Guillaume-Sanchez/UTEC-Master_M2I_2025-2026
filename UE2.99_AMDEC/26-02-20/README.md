@@ -61,3 +61,47 @@ Le Poka-Yoké, terme japonais signifiant « système anti-erreur », désigne un
 ### 17. Quels sont les autres outils détaillés dans ce cours et non dans le précédent ? 
 ### 18. Il y a 5 grandes familles de causes, lesquelles ? 
 ### 19. Et en dehors de ces deux cours, comment s’organise la sureté de fonctionnement et des systèmes d’informations, enfin où l’AMDEC trouve-t-elle sa place ?
+
+
+## 4. CAS AMDEC PROCESSUS
+
+Faites m’en un tableau par sous-processus (mode, effet, causes, criticité, plan d’action et criticité résiduelle, enfin un indicateur de suivi) résultant la décomposition du processus ici donnée (mais c’est une analyse fonctionnelle que vous devriez faire par vous-même en entreprise). Quels risques entreprendre en premier ? Quelles actions et quels risques résiduels ?
+
+| étape du process | mode de défaillance | effet | causes | G | O | D | RPN | Actions recommandé |
+|:---|:---|:---|:---|:---|:---|:---|:---|:---|
+|Réception du composants|Pièce nom conformes|Defaut produit final|Fournisseur défaillant|8|4|6|192|Audit fournisseur, controle renforcé|
+|Controle visuel|Defaut non détécté|Produit déféctueux livrée|Fatigu opérateur|7|5|7|245|Check list rotation opérateur|
+|Assemblage|Mauvais positionnement|Dysphonctionnement|Erreur Humaine|9|4|5|180|Poka Yoke mécanique|
+|Serrage Vis|Couple incorrect|casse ou desserrage|Clé mal calibrée|9|3|4|108|Calibrage périodique|
+|Controle dimentionnel (forvia)|Mesure erroné|Faux conforme|Instrument déféctueux|7|3|6|126|MSA, étalonnage|
+|Test fonctionnalité|Test incomplet|Defaut latent|Procédure incomplète|8|2|5|80|Mie à jour procédure|
+|Conditionnement|Mauvais étiquetage|Erreur client|inatendu|6|3|6|108|Scan code-barres
+
+
+
+Plan d'actions
+
+
+
+|Mode de défaillance|RPN initail|RPN final ou résiduel|
+|Defaut non détécté|245|84|
+|Pièces non conformes|192|72|
+|Positionnement|180|54|
+
+## 5. CAS AMDEC PROCESSUS CYBER
+
+
+| étape du process | mode de défaillance | effet | causes | G | O | D | RPN | Actions recommandé |
+|:---|:---|:---|:---|:---|:---|:---|:---|:---|
+|Gestion des accès|Accès non autorisé|Fuite de données|Mauvaise gestion des droits|9|4|6|216|RBCA, revue périodique|
+|Authentification|Mot de passe faible|Intrusion système|Politique sécurité absencte|8|5|7|280|MFA, politique mots de passe|
+|Exploitation des systèmes|Système non patché|Intrusion, fuite de données|Personne "Maladroite", personnel mal veillant|9|2|2|36|Surveillance|
+|Échange de données|Données non chiffrées|Interception|Protocole obslète|8|3|6|144|Chiffrement TLS/VPN|
+|Supervision|Logs non surveillé|Attaque non détéctée|Absence SOC|9|3|7|189|SIEM, alertes|
+|Sauvegarde|||||||||
+
+Plan d'actions :
+
+|Action|Responsable|Impact|
+|:---|:---|:---|
+Mise en place||| 
