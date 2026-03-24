@@ -52,8 +52,23 @@ Accueil de la classe
 # Février :
 
 - UE2.34_Analyse_de_la_securite_des_reseaux : Suite Introduction à la sécurité + TP0 + TP1
-
-
-
-- UE2.00 AMDEC : 
+- UE2.23 - Virtualisation et container : Continuité du projet
+- UE2.11 - Mathématiques : loi de poisson
+- UE2.21 - Technologies des réseaux : TP Rappel des fondamentaux + TP LiveReseau
+- UE2.41 - Environnement juridique de la cybersecurtie : Cours Magistral et première présentation
+- UE2.13 - Organisation de l'entreprise : Fin du cours + DST
 - UE2.10_Anglais : Présentation orale libre
+- UE2.00 AMDEC : Présentation méthode AMDEC + Cas pratique + DST
+Soutenange-creation-entreprise : Mise en place des groupe et création des comptes.
+
+# Mars :
+
+- UE2.33 - Analyse des vulnérabilités, menaces logicielles et sécurisation : TP4
+- UE2.11 - Mathématiques : loi de poisson, loi novinale + DST
+- UE2.23 - Virtualisation et container : Dernière séance
+- UE2.35 - Analyse_de_la_securite_des_accès :
+- UE2.17 - Contrôle de gestion et compatibilité : 
+- UE2.34 - Analyse de la securite des reseaux : 
+
+# Avril : 
+
