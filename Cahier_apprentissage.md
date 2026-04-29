@@ -58,17 +58,27 @@ Accueil de la classe
 - UE2.41 - Environnement juridique de la cybersecurtie : Cours Magistral et première présentation
 - UE2.13 - Organisation de l'entreprise : Fin du cours + DST
 - UE2.10_Anglais : Présentation orale libre
-- UE2.00 AMDEC : Présentation méthode AMDEC + Cas pratique + DST
+- UE2.32 AMDEC : Présentation méthode AMDEC + Cas pratique + DST
 Soutenange-creation-entreprise : Mise en place des groupe et création des comptes.
 
 # Mars :
 
-- UE2.33 - Analyse des vulnérabilités, menaces logicielles et sécurisation : TP4
-- UE2.11 - Mathématiques : loi de poisson, loi novinale + DST
-- UE2.23 - Virtualisation et container : Dernière séance
-- UE2.35 - Analyse_de_la_securite_des_accès :
-- UE2.17 - Contrôle de gestion et compatibilité : 
-- UE2.34 - Analyse de la securite des reseaux : 
+- UE2.33 - Analyse des vulnérabilités, menaces logicielles et sécurisation : TP4 
+- UE2.23 - Virtualisation et container : Continuité du projet 
+- UE2.11 - Mathématiques : loi de poisson, loi binomial + DST 
+- UE2.23 - Virtualisation et container : Dernière séance avant examen final
+- UE2.35 - Analyse_de_la_securite_des_accès : Génération de clé, de signature et mise en place d'un echange hybride chiffrage avec clé simétrique et envoie avec asymétrique 
+- UE2.17 - Contrôle de gestion et compatibilité : Web conf sur le BUSINESS PLAN et étude de cas 
+- UE2.34 - Analyse de la securite des reseaux : TP: Comprendre la vulnérabilité du protocole HSRP et apprendre à le durcir contre les attaques par injection de paquets
+- UE2.41 - Environnement_juridique_de_la_cybersécurite : Suite des présentations orales et Fin du cours
 
 # Avril : 
 
+- UE2.23 - Virtualisation et container : Examen Final 
+- UE2.52 - Entrepreneuriat : Brainstorming d'équipe
+- UE2.35 - Analyse_de_la_securite_des_accès : échange clé RSA pour connexion SSH et mise en place d'un Lab pour un AD sur Windows serveur  
+- UE2.17 - Contrôle de gestion et compatibilité : exele sur le Prévisonnel financié
+- UE2.10 - Anglais : Discution sur les meeting plus exercies plus orale
+- UE2.18 - Communication - Marketing : Présentation et cours magitral
+- UE2.12 - Managements_des_projets_risque : Explication de la méthode Agil / Scrum, mise en place d'un Repo Git lab avec le README.md et les user story
+- UE2.11 - Mathématiques : Correction DST et initiation à R studio + exercice
